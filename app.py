@@ -21,7 +21,8 @@ def load_blip(model_name: str = "Salesforce/blip-image-captioning-base"):
 # ------------------------
 # Caption generation
 # ------------------------
-def generate_caption(image: Image.Image, max_new_tokens: int = 20, num_beams: int = 3, min_length: int = 5, repetition_penalty: float = 1.05) -> str:
+def generate_caption(image: Image.Image, max_new_tokens: int = 20, num_beams: int = 3,
+                     min_length: int = 5, repetition_penalty: float = 1.2) -> str:
     processor, model, device = load_blip()
     image = image.convert("RGB")
     inputs = processor(images=image, return_tensors="pt").to(device)
@@ -31,10 +32,13 @@ def generate_caption(image: Image.Image, max_new_tokens: int = 20, num_beams: in
             max_new_tokens=max_new_tokens,
             num_beams=num_beams,
             min_length=min_length,
-            repetition_penalty=repetition_penalty
+            repetition_penalty=repetition_penalty,
+            no_repeat_ngram_size=2,    
+            early_stopping=True        
         )
     caption = processor.decode(output_ids[0], skip_special_tokens=True).strip()
     return caption
+
 
 # ------------------------
 # Streamlit UI
